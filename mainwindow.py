@@ -1,12 +1,15 @@
 import customtkinter as ctk
+import tkinter as tk
+import math
+import gc
 from tkinter import PhotoImage
 from PIL import Image
 from pygame import mixer
 from glob import glob
 from mutagen.mp3 import MP3
 from datetime import timedelta
-import math
 
+playlists = ["Phonk", "Skeler", "ROCK"]
 songs = glob("music\*.mp3")
 
 class App(ctk.CTk):
@@ -29,7 +32,7 @@ class App(ctk.CTk):
         self.song_name : str = ""
 
         self.minsize(640, 480)
-        self.maxsize(1920, 1080)
+        self.maxsize(640, 480)
 
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -111,7 +114,31 @@ class App(ctk.CTk):
         self.music_end_label.grid(row=3, column=4, columnspan=1, sticky="ew")
         #--end
 
-        self.i = -1
+        self.i = -1 #temporary counter
+
+
+        #--playlist-frame
+        self.playlist_frame = ctk.CTkFrame(self.menu_frame)
+        self.playlist_frame.pack(side="left", fill="y")
+        #--end
+
+        #--playlist-menu
+        self.playlist_label = ctk.CTkLabel(self.playlist_frame, text="PLAYLISTS", text_color="white", corner_radius=0)
+        self.playlist_label.pack(fill="y")
+        self.playlist_list = tk.Listbox(self.playlist_frame, height=200, 
+                    listvariable=tk.Variable(value=playlists), background="green", selectforeground="red", activestyle="none")
+        self.playlist_list.pack()
+        #--end
+
+        self.track_frame = ctk.CTkFrame(self.menu_frame, width=505, height=370, bg_color="black")
+        self.track_frame.place(x=135,y=0)
+
+        self.tracks_label = ctk.CTkLabel(self.track_frame, text="{PLAYLIST NAME}")
+        self.tracks_label.place(x=495/2 - 100, y=0, width=200)
+
+        self.track_list = tk.Listbox(self.track_frame, background="green")
+        self.track_list.place(x=0, y=30, width=505, height=340)
+        
         
     def load_music(self, file : str):
             mixer.init()
@@ -151,7 +178,7 @@ class App(ctk.CTk):
         mixer.music.play(start=0)
         self.last_song_position = 0
         
-    def play_pause_song(self):     
+    def play_pause_song(self):
         if not self.song_loaded:
             return
         if self.play_pause_state == "PAUSE":
@@ -173,11 +200,9 @@ class App(ctk.CTk):
         self.running = False    
 
     def update(self):
-        super().update()
+        super().update()    
         
-        if mixer.get_init():
-            print(mixer.find_channel())
-        
+        gc.collect() # XDDDDD :DDDDD <<<modern problems require modern solutions>>>
         if self.play_pause_state == "PLAY":
             seconds : float = self.music_slider.get() * self.current_song_length
             formated_time : list[str] = get_formated_time(math.floor(seconds))
@@ -213,7 +238,6 @@ def get_formated_time(seconds : int) -> list[str]:
     td_str = str(timedelta(seconds=seconds))
     return td_str.split(':')
     
-        
 if __name__ == "__main__":
     app = App()
     while app.running:
