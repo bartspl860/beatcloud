@@ -134,7 +134,7 @@ class App(ctk.CTk):
         self.track_frame.place(x=135,y=0)
 
         self.tracks_label = ctk.CTkLabel(self.track_frame, text="{PLAYLIST NAME}")
-        self.tracks_label.place(x=495/2 - 100, y=0, width=200)
+        self.tracks_label.place(x=495/2-100, y=0, width=200)
 
         self.track_list = tk.Listbox(self.track_frame, background="green")
         self.track_list.place(x=0, y=30, width=505, height=340)
